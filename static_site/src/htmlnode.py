@@ -28,3 +28,22 @@ class HTMLNode:
         if self.tag == other.tag and self.value == other.value and self.children == other.children and self.props == other.props:
             return True
         return False
+
+
+class LeafNode(HTMLNode):
+
+    def __init__(self, tag, value, props=None):
+        super().__init__(tag, value, None, props)
+        if self.value == None:
+            raise ValueError("LeafNodes cannot have no value")
+
+    def to_html(self):
+        if self.value == None:
+            raise ValueError("LeafNode has no value")
+        elif self.tag == None:
+            return self.value
+        elif self.props == None:
+            return f"<{self.tag}>{self.value}</{self.tag}>" 
+        else:
+            prop_to_html = self.props_to_html()
+            return f"<{self.tag} {prop_to_html}>{self.value}</{self.tag}>"
