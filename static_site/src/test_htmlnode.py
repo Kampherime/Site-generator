@@ -36,9 +36,34 @@ class TestHTMLNode(unittest.TestCase):
         print(f"Testing to see if multiple properties function: {test5.to_html()}")
         
     def test_parent_node(self):
-        pass
-
-
+        test1 = ParentNode("p",
+                           [
+                               LeafNode("b", "text"),
+                               LeafNode(None, "more text")
+                            ], None)
+        print(test1.to_html())
+        test2 = ParentNode("div",
+                           [
+                               ParentNode("p",
+                                          [
+                                              LeafNode("b", "test"),
+                                              LeafNode("p", "more test :3"),
+                                              ParentNode("p", 
+                                                         [
+                                                            LeafNode("p", "Indents go crazy :P")
+                                                        ])
+                                              ]),
+                                ParentNode("p", 
+                                              [
+                                              LeafNode("b", "Lets make it worse")
+                                              ])
+                                            ])
+        print(f"Gods this is ugly: {test2.to_html()}")
+        try:
+            test3 = ParentNode("div", None, None)
+            print(test3.to_html())
+        except Exception as e:
+            print(f"This one isn't as bad: {e}")
 
 if __name__ == "__main__":
     unittest.main()
