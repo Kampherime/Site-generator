@@ -23,7 +23,7 @@ class HTMLNode:
         return return_string.strip()
 
     def __repr__(self):
-        print(f"HTML Tag: {self.tag}, Value: {self.value}, Children: {self.children}, Properties: {self.props}")
+        return f"HTML Tag: {self.tag}, Value: {self.value}, Children: {self.children}, Properties: {self.props}"
 
     def __eq__(self, other):
         if (self.tag == other.tag and self.value == other.value and
@@ -46,9 +46,15 @@ class LeafNode(HTMLNode):
             return self.value
         elif self.props is None:
             return f"<{self.tag}>{self.value}</{self.tag}>"
+        # this is for images which have an empty string as their "value" parameter instead of None
+        elif self.value == "":
+            return f"<{self.tag} {self.props_to_html()}>"
         else:
             prop_to_html = self.props_to_html()
             return f"<{self.tag} {prop_to_html}>{self.value}</{self.tag}>"
+
+    def __repr__(self):
+        return f"HTML Tag: {self.tag}, Value: {self.value}, Properties: {self.props}"
 
 
 class ParentNode(HTMLNode):
