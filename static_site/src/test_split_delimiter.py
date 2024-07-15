@@ -1,5 +1,6 @@
 from TheBeast import split_delimiter, split_by_images, split_by_links
 from textnode import TextNode
+from THE_ENTITY import text_to_textnodes
 import unittest
 
 
@@ -87,3 +88,16 @@ class testTheLoser(unittest.TestCase):
 
         except Exception as e:
             print(f"failed to wonkadoodledoo {e} (I'm so not lucid)")
+
+    def test_text_to_textnode(self):
+        test_paragraph = "This is **text** with an *italic* word and a `code block` and an ![image](https://pm1.narvii.com/6453/55ddf8e7cb11617199526c66bbcab69f9196d338_hq.jpg) and a [link](https://www.google.com/)"
+        test_paragraph_2 = "2nd paragraph. *Italic*, **bold**, and `monospace`. Itemized lists look like:"
+        test_paragraph_3 = '![example image](example-image.jpg "An exemplary image")'
+        
+        try:
+            print(text_to_textnodes(test_paragraph))
+            print(text_to_textnodes(test_paragraph_2))
+            print(text_to_textnodes(test_paragraph_3))
+        except Exception as e:
+            print(f"Failed to generate text from textnodes, because of a: {e}")
+
