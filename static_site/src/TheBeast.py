@@ -1,7 +1,7 @@
 # creating a function called "split_delimiter" that well... splits strings :3c 
 # it'll accept an argument to split strings and convert them to inline html x)
-
-
+from linksntwinks import extract_markdown_links, extract_markdown_images 
+import re
 from textnode import TextNode #might need?
 
 # okay lets do a bit of planning here
@@ -34,53 +34,42 @@ from textnode import TextNode #might need?
 def split_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
     for node in old_nodes: 
-        if node.text_type != "text":
+        if node.text_type != "text" or delimiter not in node.text:
             new_nodes.append(node)
             continue
-        if delimiter in node.text:
-            split_text = node.text.split(delimiter, 1)
-            new_nodes.append(TextNode(split_text[0], "text", None))
-            # if there is a split, then the first and last nodes would be text
-            if delimiter in split_text[1]:
-                appendable_node = split_text[1].split(delimiter, 1)
-                new_nodes.append(TextNode(appendable_node[0], text_type, None))
-                new_nodes.extend(split_delimiter([TextNode(appendable_node[1], "text", None)], delimiter, text_type))
+        split_text = node.text.split(delimiter, 1)
+        if delimiter not in split_text[1]:
+            raise SyntaxError("Invalid markdown syntax")
+        new_nodes.append(TextNode(split_text[0], "text", None))
+        # if there is a split, then the first and last nodes would be text
+        appendable_node = split_text[1].split(delimiter, 1)
+        new_nodes.append(TextNode(appendable_node[0], text_type, None))
+        new_nodes.extend(split_delimiter([TextNode(appendable_node[1], "text", None)], delimiter, text_type))
+
     return(new_nodes)
 
 
 
-                        
-
-
-
-
-
-
-'''        
-def split_delimiter(old_nodes, delimiter, text_type):
+def split_by_images(old_nodes):
     new_nodes = []
     for node in old_nodes:
-        if node.text_type != "text":
+        images = extract_markdown_images(node.text)
+        if node.text_type != "text" or len(images) == 0:
             new_nodes.append(node)
-        else:
-            # ugh this is ugly
-            checkable_list = node.text.split()
-            print(checkable_list)
-            if len(checkable_list) == 1: # checking to see if anything was actually split based on the delimiter
-                new_nodes.append(checkable_list[0])
-            else:
-                return_list = []
-                temporary_string = ""
-                for node_text in checkable_list: 
-                    if node_text[0] == delimiter and node_text[len(node_text)-1] != delimiter:
-                        raise Exception("Invalid markdown syntax")
-                    if node_text[0] == delimiter and node_text[len(node_text)-1] == delimiter:
-                        return_list.append(TextNode(temporary_string, "text", None))
-                        temporary_string = ""
-                        return_list.append(TextNode(f"{node_text} ", text_type, None))
-                        print("it parsed right")
-                    else:
-                        temporary_string += f"{node_text} "
-                return_list.append(TextNode(temporary_string, "text", None))
-                new_nodes.extend(return_list)
-    return new_nodes'''
+            continue
+        split_node = re.split(r'!\[(.*?)\]\((.*?)\)', node.text, 1)
+        new_nodes.extend([TextNode(split_node[0], "text", None), TextNode(split_node[1], "image", split_node[2])])
+        new_nodes.extend(split_by_images([TextNode(split_node[3], "text", None)]))
+    return new_nodes        
+
+def split_by_links(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        links = extract_markdown_links(node.text)
+        if node.text_type != "text" or len(links) == 0:
+            new_nodes.append(node)
+            continue
+        split_node = re.split(r' \[(.*?)\]\((.*?)\)', node.text, 1)
+        new_nodes.extend([TextNode(split_node[0], "text", None), TextNode(f" {split_node[1]}", "link", split_node[2])])
+        new_nodes.extend(split_by_links([TextNode(split_node[3], "text", None)]))
+    return new_nodes        
