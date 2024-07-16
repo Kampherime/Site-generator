@@ -1,5 +1,6 @@
 import unittest
 from linksntwinks import extract_markdown_links, extract_markdown_images
+from blocks import markdown_to_blocks
 
 
 class test_the_guys(unittest.TestCase):
@@ -29,3 +30,39 @@ class test_the_guys(unittest.TestCase):
             print(images_from_paragraph)
         except Exception as e:
             print(f"Failed to do both because {e}")
+
+
+    def test_blocks(self):
+        paragraph = '''
+        Paragraphs are separated by a blank line.
+
+        2nd paragraph. *Italic*, **bold**, and `monospace`. Itemized lists
+        look like:
+
+          * this one
+          * that one
+          * the other one
+
+        Note that --- not considering the asterisk --- the actual text
+        content starts at 4-columns in.
+
+        > Block quotes are
+        > written like so.
+        >
+        > They can span multiple paragraphs,
+        > if you like.
+
+        Use 3 dashes for an em-dash. Use 2 dashes for ranges (ex., "it's all
+        in chapters 12--14"). Three dots ... will be converted to an ellipsis.
+        Unicode is supported. ''' 
+        print (paragraph)
+        try:
+            blocks = markdown_to_blocks(paragraph)
+            for i in range(0, len(blocks)):
+                print(f"Block number {i}: {blocks[i]}")
+            print(blocks)
+        except Exception as e:
+            print(f"HEY LOOK HERE GOOBER GOOGUS JOKADSHJFOAUIJPHFGIOUPASDFASHUPJOAHVJPUSCJOKPASDNHGUIOJPHD {e}")
+
+        blocks2 = ""
+        print(markdown_to_blocks(blocks2))
